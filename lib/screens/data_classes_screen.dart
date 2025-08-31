@@ -5,6 +5,8 @@ import 'package:flutter_test_project/blocs/settings_bloc/settings_bloc.dart';
 import 'package:flutter_test_project/screens/schedule_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test_project/generated/l10n.dart';
+import 'package:flutter_test_project/integrations/telegram.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ClassesListWidget extends StatefulWidget {
   const ClassesListWidget({Key? key}) : super(key: key);
@@ -17,6 +19,8 @@ class _ClassesListWidgetState extends State<ClassesListWidget> {
   List<DataClasses> _classes = [];
   bool _isLoading = true;
 
+  bool get _useTg => kIsWeb && TelegramWebApp.isAvailable;
+
   @override
   void initState() {
     super.initState();
@@ -25,7 +29,12 @@ class _ClassesListWidgetState extends State<ClassesListWidget> {
 
   Future<void> _loadClassesData() async {
     try {
-      final data = await Storage().loadClassesData();
+      List<DataClasses> data = [];
+      if (!_useTg) {
+        data = await Storage().loadClassesData();
+      } else {
+        data = Storage().localStorageReadClasses();
+      }
       setState(() {
         _classes = data;
         _isLoading = false;

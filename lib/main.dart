@@ -11,15 +11,18 @@ import 'blocs/settings_bloc/settings_bloc.dart';
 import 'generated/l10n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'integrations/telegram.dart';
+import 'package:localstorage/localstorage.dart';
 
 void main() async {
   await TelegramWebApp.init();
+  WidgetsFlutterBinding.ensureInitialized();
+  await initLocalStorage();
   runApp(const ProviderScope(child: ScheduleApp()));
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemNavigationBarIconBrightness: Brightness.light,
       systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent, 
+      systemNavigationBarDividerColor: Colors.transparent,
       systemNavigationBarContrastEnforced: false // navigation bar icons color
       ));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,

@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test_project/services/parser/parser.dart';
 import 'package:flutter_test_project/services/storage.dart';
+import 'package:flutter_test_project/integrations/telegram.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 part 'schedule_event.dart';
 part 'schedule_state.dart';
@@ -13,6 +14,8 @@ part 'schedule_state.dart';
 class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   late DateTime currentDay = _dateOnly(DateTime.now());
   PlatformFile? globalFile;
+
+  bool get _useTg => kIsWeb && TelegramWebApp.isAvailable;
 
   ScheduleBloc() : super(ScheduleInitial()) {
     on<ScheduleEvent>((event, emit) {});
@@ -47,6 +50,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
     if (result == null || result.files.isEmpty) {
       emit(const ScheduleError('Something went wrong'));
+      print(result);
       return;
     }
 
@@ -72,20 +76,30 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
       final parser = ExcelParsing(int.parse(event.numOfGroups));
       final days = await parser.parse(globalFile!) as List<Day>;
-
-      for (final day in days) {
-        final classesForGroup =
-            day.classes[int.parse(event.group)] ?? <String>[];
-        final jsonString = jsonEncode(classesForGroup);
-        await Storage().saveSchedule(day.date, jsonString);
+      if (!_useTg) {
+        for (final day in days) {
+          final classesForGroup =
+              day.classes[int.parse(event.group)] ?? <String>[];
+          final jsonString = jsonEncode(classesForGroup);
+          await Storage().saveSchedule(day.date, jsonString);
+        }
+      } else {
+        Storage().localStorageSaveSchedule(days, int.parse(event.group));
       }
 
       final time = parser.parseTimeOfClasses();
-      await Storage().saveTime(time);
+      if (!_useTg) {
+        await Storage().saveTime(time);
+      } else {
+        Storage().localStorageSaveTime(time);
+      }
 
       final classesData = parser.parseDataClasses();
-      await Storage().saveClassesData(classesData);
-
+      if (!_useTg) {
+        await Storage().saveClassesData(classesData);
+      } else {
+        Storage().localStorageSaveDataClasses(classesData);
+      }
       emit(SavedSchedule());
     } catch (e) {
       emit(ScheduleError('Import error: $e'));
@@ -95,19 +109,25 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   FutureOr<void> _loadSchedule(
       LoadSchedule event, Emitter<ScheduleState> emit) async {
     emit(ScheduleLoading());
-
     try {
-      final scheduleJson =
-          await Storage().readSchedule(_dateToString(event.date));
       List<String> classes = [];
+      String scheduleJson = '';
+      if (!_useTg) {
+        scheduleJson = await Storage().readSchedule(_dateToString(event.date));
+      } else {
+        classes = Storage().localStorageReadSchedule(_dateToString(event.date));
+      }
       if (scheduleJson.isNotEmpty) {
         try {
-          final decoded = jsonDecode(scheduleJson) as List<dynamic>;
-          classes = decoded.cast<String>().toList();
+          classes = jsonDecode(scheduleJson) as List<String>;
         } catch (_) {}
       }
-
-      final time = await Storage().readTime();
+      List<String> time = [];
+      if (!_useTg) {
+        time = await Storage().readTime();
+      } else {
+        time = Storage().localStorageReadTime();
+      }
 
       if (classes.isEmpty) {
         emit(const ScheduleDayIsEmpty(''));
@@ -115,9 +135,8 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
       }
 
       emit(ScheduleLoaded(classes, event.date, time));
-    } catch (e) {
-      emit(ScheduleError('Load error: $e'));
-    }
+    } catch (_) {}
+    emit(ScheduleLoaded(List.empty(), event.date, List.empty()));
   }
 
   String _dateToString(DateTime date) {

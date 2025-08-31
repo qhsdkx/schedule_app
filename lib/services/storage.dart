@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import '../integrations/telegram.dart';
 import '../models/settings.dart';
 import 'package:flutter_test_project/services/parser/parser.dart';
+import 'package:localstorage/localstorage.dart';
 
 class Storage {
   static const String DATA_KEY = "DATA_CLASSES";
@@ -23,7 +24,7 @@ class Storage {
   Future<void> saveSettings(Settings settings) async {
     final json = jsonEncode(settings.toMap());
     if (_useTg) {
-      await TelegramWebApp.cloudSetItem(SETTINGS_KEY, json);
+      localStorage.setItem(SETTINGS_KEY, json);
     } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(SETTINGS_KEY, json);
@@ -32,8 +33,9 @@ class Storage {
 
   Future<Settings?> readSettings() async {
     if (_useTg) {
-      final s = await TelegramWebApp.cloudGetItem(SETTINGS_KEY);
-      if (s != null && s.isNotEmpty) return Settings.fromMap(jsonDecode(s));
+      var settings = localStorage.getItem(SETTINGS_KEY);
+      if (settings != null && settings.isNotEmpty)
+        return Settings.fromMap(jsonDecode(settings));
       return null;
     } else {
       final prefs = await SharedPreferences.getInstance();
@@ -45,9 +47,7 @@ class Storage {
 
   Future<void> saveSchedule(String date, String jsonFromBloc) async {
     if (_useTg) {
-      final key = 'schedule:$date';
-      await TelegramWebApp.deviceSetItem(key, jsonFromBloc);
-      await TelegramWebApp.cloudSetItem('current_schedule_key', key);
+      localStorage.setItem('schedule:$date', jsonFromBloc);
     } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(date, jsonFromBloc);
@@ -57,7 +57,7 @@ class Storage {
   Future<String> readSchedule(String date) async {
     if (_useTg) {
       final key = 'schedule:$date';
-      final s = await TelegramWebApp.deviceGetItem(key);
+      final s = localStorage.getItem(key);
       return s ?? '';
     } else {
       final prefs = await SharedPreferences.getInstance();
@@ -67,7 +67,11 @@ class Storage {
 
   Future<void> clearStorage() async {
     if (_useTg) {
-      return;
+      final settings = localStorage.getItem(SETTINGS_KEY);
+      final language = localStorage.getItem(LANGUAGE_KEY);
+      localStorage.clear();
+      localStorage.setItem(SETTINGS_KEY, settings ?? '');
+      localStorage.setItem(LANGUAGE_KEY, language ?? '');
     } else {
       final prefs = await SharedPreferences.getInstance();
       final settings = prefs.getString(SETTINGS_KEY);
@@ -80,7 +84,7 @@ class Storage {
 
   Future<void> clearFullStorage() async {
     if (_useTg) {
-      return;
+      localStorage.clear();
     } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
@@ -89,7 +93,7 @@ class Storage {
 
   Future<void> saveTime(List<String> time) async {
     if (_useTg) {
-      await TelegramWebApp.cloudSetItem('time4', jsonEncode(time));
+      localStorage.setItem('time4', jsonEncode(time));
     } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList('time4', time);
@@ -98,10 +102,9 @@ class Storage {
 
   Future<List<String>> readTime() async {
     if (_useTg) {
-      final s = await TelegramWebApp.cloudGetItem('time4');
-      if (s == null || s.isEmpty) return [];
-      final list = (jsonDecode(s) as List).map((e) => e.toString()).toList();
-      return list;
+      final ti = localStorage.getItem('time4');
+      if (ti == null || ti.isEmpty) return [];
+      return (jsonDecode(ti) as List).map((e) => e.toString()).toList();
     } else {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getStringList('time4') ?? [];
@@ -112,7 +115,7 @@ class Storage {
     final jsonList = classes.map((item) => item.toJson()).toList();
     final jsonStr = jsonEncode(jsonList);
     if (_useTg) {
-      await TelegramWebApp.deviceSetItem(DATA_KEY, jsonStr);
+      localStorage.setItem(DATA_KEY, jsonStr);
     } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(DATA_KEY, jsonStr);
@@ -122,7 +125,7 @@ class Storage {
   Future<List<DataClasses>> loadClassesData() async {
     final String? jsonString;
     if (_useTg) {
-      jsonString = await TelegramWebApp.deviceGetItem(DATA_KEY);
+      jsonString = localStorage.getItem(DATA_KEY);
     } else {
       final prefs = await SharedPreferences.getInstance();
       jsonString = prefs.getString(DATA_KEY);
@@ -141,7 +144,7 @@ class Storage {
 
   Future<void> saveLanguage(String language) async {
     if (_useTg) {
-      await TelegramWebApp.cloudSetItem(LANGUAGE_KEY, language);
+      localStorage.setItem(LANGUAGE_KEY, language);
     } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(LANGUAGE_KEY, language);
@@ -150,12 +153,52 @@ class Storage {
 
   Future<String> loadLanguage() async {
     if (_useTg) {
-      final v = await TelegramWebApp.cloudGetItem(LANGUAGE_KEY);
+      final v = localStorage.getItem(LANGUAGE_KEY);
       return (v == null || v.isEmpty) ? _deviceLang : v;
     } else {
       final prefs = await SharedPreferences.getInstance();
       final v = prefs.getString(LANGUAGE_KEY);
       return (v == null || v.isEmpty) ? _deviceLang : v;
     }
+  }
+
+  void localStorageSaveSchedule(List<Day> days, int group) {
+    for (var day in days) {
+      localStorage.setItem(day.date, jsonEncode(day.classes[group]));
+    }
+  }
+
+  List<String> localStorageReadSchedule(String date) {
+    final jsonString = localStorage.getItem(date) ?? '';
+    final decodedData = jsonDecode(jsonString) as List<dynamic>;
+    return decodedData.map((item) => item.toString()).toList();
+  }
+
+  void localStorageSaveTime(List<String> time) {
+    localStorage.setItem('time4', jsonEncode(time));
+  }
+
+  List<String> localStorageReadTime() {
+    final jsonString = localStorage.getItem('time4') ?? '';
+    final decodedData = jsonDecode(jsonString) as List<dynamic>;
+    return decodedData.map((item) => item.toString()).toList();
+  }
+
+  void localStorageSaveDataClasses(List<DataClasses> classes) {
+    final jsonList = classes.map((item) => item.toJson()).toList();
+    localStorage.setItem(DATA_KEY, jsonEncode(jsonList));
+  }
+
+  List<DataClasses> localStorageReadClasses() {
+    final jsonString = localStorage.getItem(DATA_KEY) ?? '';
+    final decodedData = jsonDecode(jsonString) as List<dynamic>;
+    return decodedData
+        .map((item) => DataClasses(
+              item['shortName'] as String,
+              item['fullName'] as String,
+              item['attestationForm'] as String,
+              item['teachers'] as String,
+            ))
+        .toList();
   }
 }

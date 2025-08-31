@@ -10,6 +10,7 @@ import 'package:flutter_test_project/screens/settings_screen.dart';
 import 'package:flutter_test_project/widgets/guider.dart';
 import 'package:flutter_test_project/widgets/schedule_widget.dart';
 import 'package:flutter_test_project/widgets/typography.dart';
+import 'package:flutter_test_project/services/app_alerts.dart';
 import 'package:rive/rive.dart';
 import 'package:unicons/unicons.dart';
 import '../blocs/schedule_bloc/schedule_bloc.dart';
