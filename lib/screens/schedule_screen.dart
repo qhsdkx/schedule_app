@@ -261,26 +261,24 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildEmptyListWidget(BuildContext context) {
-    return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 10),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.5,
-            width: MediaQuery.of(context).size.width * 0.7,
-            child: const RiveAnimation.asset(
-              'assets/anims/sleep.riv',
-            ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const SizedBox(height: 10),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.5,
+          width: MediaQuery.of(context).size.width * 0.7,
+          child: const RiveAnimation.asset(
+            'assets/anims/sleep.riv',
           ),
-          const SizedBox(height: 10),
-          Center(
-              child: Text(
-            S.of(context).emptyLessons,
-            style: Style.bodyBold.copyWith(fontSize: 16),
-          )),
-        ],
-      ),
+        ),
+        const SizedBox(height: 10),
+        Center(
+            child: Text(
+          S.of(context).emptyLessons,
+          style: Style.bodyBold.copyWith(fontSize: 16),
+        )),
+      ],
     );
   }
 
