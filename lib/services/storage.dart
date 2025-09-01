@@ -137,30 +137,26 @@ class Storage {
         .toList();
   }
 
-  Future<void> _ensureTasksReady() async {
-    localStorage.length != 0;
-  }
-
   Future<List<Homework>> loadTasks() async {
-    await _ensureTasksReady();
-    final dynamic raw = localStorage.getItem(TASKS_KEY);
-    if (raw == null) return [];
+    final s = localStorage.getItem(TASKS_KEY);
 
-    final List<dynamic> decoded =
-        raw is String ? (jsonDecode(raw) as List) : (raw as List);
-    return decoded
-        .map((e) => Homework.fromJson(Map<String, dynamic>.from(e as Map)))
-        .toList();
+    if (s == null || s.trim().isEmpty) return <Homework>[];
+    try {
+      final list = (jsonDecode(s) as List)
+          .map((e) => Homework.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList();
+      return list;
+    } catch (_) {
+      return <Homework>[];
+    }
   }
 
   Future<void> saveTasks(List<Homework> tasks) async {
-    await _ensureTasksReady();
     final jsonStr = jsonEncode(tasks.map((e) => e.toJson()).toList());
     localStorage.setItem(TASKS_KEY, jsonStr);
   }
 
   Future<int> nextTaskId() async {
-    await _ensureTasksReady();
     final String? raw = localStorage.getItem(TASKS_SEQ_KEY);
     if (raw == null || raw.isEmpty) {
       final tasks = await loadTasks();

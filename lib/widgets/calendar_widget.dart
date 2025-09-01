@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_test_project/generated/l10n.dart';
 import 'package:flutter_test_project/widgets/typography.dart';
-// поправь импорт под свой путь:
 import 'package:flutter_test_project/services/storage.dart';
 
 import '../blocs/schedule_bloc/schedule_bloc.dart';

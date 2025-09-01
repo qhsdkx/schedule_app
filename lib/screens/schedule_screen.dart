@@ -261,21 +261,26 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildEmptyListWidget(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.5,
-          width: MediaQuery.of(context).size.width * 0.7,
-          child: const RiveAnimation.asset(
-            'assets/anims/sleep.riv',
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(height: 10),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            width: MediaQuery.of(context).size.width * 0.7,
+            child: const RiveAnimation.asset(
+              'assets/anims/sleep.riv',
+            ),
           ),
-        ),
-        Text(
-          S.of(context).emptyLessons,
-          style: Style.bodyBold.copyWith(fontSize: 16),
-        ),
-      ],
+          const SizedBox(height: 10),
+          Center(
+              child: Text(
+            S.of(context).emptyLessons,
+            style: Style.bodyBold.copyWith(fontSize: 16),
+          )),
+        ],
+      ),
     );
   }
 
@@ -283,8 +288,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final cs = Theme.of(context).colorScheme;
 
     return Padding(
-      padding:
-          const EdgeInsets.only(bottom: 24, right: 12), // приподняли на 24px
+      padding: const EdgeInsets.only(bottom: 24, right: 12),
       child: FloatingActionButton(
         heroTag: 'schedule-fab',
         onPressed: () => _showContextMenu(context),
