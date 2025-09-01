@@ -17,101 +17,82 @@ class OnBoardingPage extends StatefulWidget {
 
 class _OnBoardingPageState extends State<OnBoardingPage> {
   final int _numPages = 4;
+  final PageController _pageController = PageController(initialPage: 0);
+  int _currentPage = 0;
 
-  static const List<Image> containersImages = [
-    Image(
-      image: AssetImage('assets/images/max.png'),
-      height: 375.0,
-      width: 375.0,
-    ),
-    Image(
-      image: AssetImage('assets/images/schedule.png'),
-      height: 324.0,
-      width: 328.0,
-    ),
-    Image(
-      image: AssetImage('assets/images/computer-engineer.png'),
-      height: 315.0,
-      width: 315.0,
-    ),
-    Image(
-      image: AssetImage('assets/images/geography.png'),
-      height: 315.0,
-      width: 315.0,
-    ),
+  static const List<String> _assetPaths = [
+    'assets/images/max.png',
+    'assets/images/schedule.png',
+    'assets/images/computer-engineer.png',
+    'assets/images/geography.png',
   ];
 
-  static const List titlesTexts = [
+  static const List<String> titlesTexts = [
     'Добро пожаловать!',
     'Смотри расписание!',
     'Будь в курсе в любой момент!',
     'Узнай как пользоваться!',
   ];
 
-  static const List contentTexts = [
+  static const List<String> contentTexts = [
     'Это приложение было создано студентами для студентов',
     'В столовой ты или на парах - оказывается, расписание можно смотреть и без всяких файлов',
     'Иногда так лень открывать файл в Excel и искать нужную тебе информацию, мы это исправили',
-    'Просто нажми на главном экране на плюс в правом нижнем углу, выставь свою группу и количество групп на потоке. Довольствуйся расписанием!'
+    'Просто нажми на главном экране на плюс в правом нижнем углу, выставь свою группу и количество групп на потоке. Довольствуйся расписанием!',
   ];
-
-  double getImageTopPadding(int page) {
-    switch (page) {
-      case 0:
-        return 18.0;
-      case 1:
-        return 70.0;
-      case 2:
-        return 73.0;
-      case 3:
-        return 30.0;
-      case 4:
-        return 91.0;
-      default:
-        return 0.0;
-    }
-  }
-
-  final PageController _pageController = PageController(initialPage: 0);
-
-  int _currentPage = 0;
 
   List<Widget> _buildPageView() {
     return List.generate(_numPages, (index) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Stack(
-          alignment: AlignmentDirectional.center,
-          textDirection: TextDirection.ltr,
-          children: <Widget>[
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Padding(
-                    padding: EdgeInsets.only(top: getImageTopPadding(index)),
-                    child: containersImages[index]),
-              ),
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: LayoutBuilder(
+              builder: (context, c) {
+                final imgMaxH = c.maxHeight * 0.5;
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: imgMaxH,
+                        maxWidth: 420,
+                      ),
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: Image.asset(_assetPaths[index]),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Text(
+                        titlesTexts[index],
+                        style: Style.h4,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Text(
+                        contentTexts[index],
+                        style: Style.bodyL,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-            Positioned(
-              left: 0,
-              right: 0,
-              top: MediaQuery.of(context).size.height * 0.48,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 12),
-                  Text(
-                    titlesTexts[index],
-                    style: Style.h4,
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(contentTexts[index], style: Style.bodyL),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       );
     });
@@ -119,15 +100,17 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    GlobalKey<_PageIndicatorsState> pageStateKey = GlobalKey();
+    final pageStateKey = GlobalKey<_PageIndicatorsState>();
 
     final Widget pageIndicator = PageIndicators(
       key: pageStateKey,
       onClick: () {
-        _pageController.nextPage(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.ease,
-        );
+        if (_currentPage < _numPages - 1) {
+          _pageController.nextPage(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.ease,
+          );
+        }
       },
       dotsNum: _numPages,
     );
@@ -144,7 +127,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 controller: _pageController,
                 onPageChanged: (int page) {
                   _currentPage = page;
-                  pageStateKey.currentState!.updateWith(_currentPage);
+                  pageStateKey.currentState?.updateWith(_currentPage);
                 },
                 children: _buildPageView(),
               ),
@@ -172,16 +155,6 @@ class PageIndicators extends StatefulWidget {
 }
 
 class _PageIndicatorsState extends State<PageIndicators> {
-  List<Widget> _buildPageIndicators(int currentPage) {
-    List<Widget> list = [];
-    for (int i = 0; i < widget.dotsNum; i++) {
-      list.add(i == currentPage
-          ? const IndicatorPageView(isActive: true)
-          : const IndicatorPageView(isActive: false));
-    }
-    return list;
-  }
-
   int _currentPage = 0;
 
   void updateWith(int value) {
@@ -190,35 +163,51 @@ class _PageIndicatorsState extends State<PageIndicators> {
     });
   }
 
+  List<Widget> _buildPageIndicators(int currentPage) {
+    return List.generate(
+      widget.dotsNum,
+      (i) => i == currentPage
+          ? const IndicatorPageView(isActive: true)
+          : const IndicatorPageView(isActive: false),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SettingsBloc>();
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 35.0, left: 20.0, right: 20.0),
+      padding:
+          const EdgeInsets.only(bottom: 24.0, left: 16.0, right: 16.0, top: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          widget.dotsNum - 1 == _currentPage
-              ? Container()
-              : TextButton(
-                  onPressed: () {
-                    bloc.add(ChangeSettings(
-                        bloc.settings.themeMode,
-                        bloc.settings.group,
-                        bloc.settings.numOfGroups,
-                        false,
-                        false));
-                    pushToMainScreen(context);
-                  },
-                  child: Text(
-                    S.of(context).pass,
-                    style: Style.buttonS.copyWith(),
-                  ),
-                ),
-          Row(
-            children: _buildPageIndicators(_currentPage),
+          // Skip слева
+          if (widget.dotsNum - 1 != _currentPage)
+            TextButton(
+              onPressed: () {
+                bloc.add(ChangeSettings(
+                  bloc.settings.themeMode,
+                  bloc.settings.group,
+                  bloc.settings.numOfGroups,
+                  false,
+                  false,
+                ));
+                pushToMainScreen(context);
+              },
+              child: Text(S.of(context).pass, style: Style.buttonS),
+            )
+          else
+            const SizedBox(width: 64),
+
+          Expanded(
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: _buildPageIndicators(_currentPage),
+              ),
+            ),
           ),
+
           NextPageViewButton(
             isLastPage: widget.dotsNum - 1 == _currentPage,
             onClick: widget.onClick,
