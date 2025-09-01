@@ -21,15 +21,11 @@ class ServicesScreen extends StatelessWidget {
         return false;
       },
       child: Scaffold(
-        // backgroundColor: AppTheme.colors.background01,
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              pushToMainScreen(context);
-            },
+            onPressed: () => pushToMainScreen(context),
           ),
-          // backgroundColor: AppTheme.colors.background01,
           elevation: 0,
           title: Text(
             S.of(context).services,
@@ -65,137 +61,135 @@ class ServicesView extends StatefulWidget {
 class _ServicesViewState extends State<ServicesView> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return ListView(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              S.of(context).main,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+      children: [
+        // --- Main services header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            S.of(context).main,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // --- Horizontal services list
+        SizedBox(
+          height: 152,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              ServiceCard(
+                serviceTitle: S.of(context).website,
+                serviceUrl: 'https://www.pac.by/',
+                serviceIcon: const ServiceIcon(
+                  color: Color.fromARGB(255, 71, 132, 253),
+                  iconColor: Color(0xFFFFFFFF),
+                  icon: Icons.school,
+                ),
+                launchMode: LaunchMode.inAppBrowserView,
+                serviceDescription: S.of(context).websiteDesc,
               ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 152,
-            child: ListView(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                ServiceCard(
-                  serviceTitle: S.current.website,
-                  serviceUrl: 'https://www.pac.by/',
-                  serviceIcon: const ServiceIcon(
-                    color: Color.fromARGB(255, 71, 132, 253),
-                    iconColor: Color(0xFFFFFFFF),
-                    icon: Icons.school,
-                  ),
-                  launchMode: LaunchMode.inAppBrowserView,
-                  serviceDescription: S.current.websiteDesc,
+              ServiceCard(
+                serviceTitle: 'Moodle',
+                serviceUrl: 'https://moodle.pac.by/moodle/',
+                serviceIcon: const ServiceIcon(
+                  color: Color.fromARGB(255, 248, 156, 76),
+                  iconColor: Color(0xFF181A20),
+                  icon: UniconsLine.cloud_bookmark,
                 ),
-                ServiceCard(
-                  serviceTitle: 'Moodle',
-                  serviceUrl: 'https://moodle.pac.by/moodle/',
-                  serviceIcon: const ServiceIcon(
-                    color: Color.fromARGB(255, 248, 156, 76),
-                    iconColor: Color(0xFF181A20),
-                    icon: UniconsLine.cloud_bookmark,
-                  ),
-                  launchMode: LaunchMode.externalApplication,
-                  serviceDescription: S.current.moodleDesc,
-                ),
-                ServiceCard(
-                  serviceTitle: 'ilex',
-                  serviceUrl: 'https://ilex.by/',
-                  serviceIcon: const ServiceIcon(
-                    color: Color.fromARGB(255, 79, 211, 103),
-                    iconColor: Color(0xFF181A20),
-                    icon: Icons.menu_book,
-                  ),
-                  launchMode: LaunchMode.externalApplication,
-                  serviceDescription: S.current.ilexDesc,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              S.of(context).communities,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+                launchMode: LaunchMode.externalApplication,
+                serviceDescription: S.of(context).moodleDesc,
               ),
+              ServiceCard(
+                serviceTitle: 'ilex',
+                serviceUrl: 'https://ilex.by/',
+                serviceIcon: const ServiceIcon(
+                  color: Color.fromARGB(255, 79, 211, 103),
+                  iconColor: Color(0xFF181A20),
+                  icon: Icons.menu_book,
+                ),
+                launchMode: LaunchMode.externalApplication,
+                serviceDescription: S.of(context).ilexDesc,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // --- Communities header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            S.of(context).communities,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ListView(
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              children: [
-                CommunityCard(
-                  title: S.current.aupprbChannel,
-                  url: 'https://t.me/schedulepacby',
-                  logo: CircleAvatar(
-                    // backgroundColor: AppTheme.colors.colorful01,
-                    foregroundImage: Image.network(
-                      'https://www.pac.by/upload/iblock/d35/_-_.png',
-                    ).image,
-                  ),
-                  launchMode: LaunchMode.externalApplication,
-                  description: S.current.aupprbChannelDes,
+        ),
+        const SizedBox(height: 8),
+
+        // --- Communities list (non-scrollable; overall page scrolls)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: [
+              CommunityCard(
+                title: S.of(context).aupprbChannel,
+                url: 'https://t.me/schedulepacby',
+                logo: const CircleAvatar(
+                  foregroundImage: AssetImage('assets/images/smth.png'),
                 ),
-                CommunityCard(
-                  title: S.current.studSovet,
-                  url: 'https://vk.com/st_au',
-                  logo: CircleAvatar(
-                    // backgroundColor: AppTheme.colors.colorful01,
-                    foregroundImage: Image.network(
-                      'https://sun9-49.userapi.com/impg/-W_reccl0idEA4wReDYLhhCbUY5Tby_JpoiKqA/3cZXJ8xDd5g.jpg?size=2048x2048&quality=96&sign=7ee1928a16f85dec22816aea158a67b9&type=album',
-                    ).image,
-                  ),
-                  launchMode: LaunchMode.externalApplication,
-                  description: S.current.studSovetDesc,
+                launchMode: LaunchMode.externalApplication,
+                description: S.of(context).aupprbChannelDes,
+              ),
+              CommunityCard(
+                title: S.of(context).studSovet,
+                url: 'https://vk.com/st_au',
+                logo: CircleAvatar(
+                  foregroundImage: Image.network(
+                    'https://sun9-49.userapi.com/impg/-W_reccl0idEA4wReDYLhhCbUY5Tby_JpoiKqA/3cZXJ8xDd5g.jpg?size=2048x2048&quality=96&sign=7ee1928a16f85dec22816aea158a67b9&type=album',
+                  ).image,
                 ),
-                CommunityCard(
-                  title: S.current.profsouz,
-                  url: 'https://vk.com/profsouz_au',
-                  logo: CircleAvatar(
-                    // backgroundColor: AppTheme.colors.colorful01,
-                    foregroundImage: Image.network(
-                      'https://sun9-72.userapi.com/impg/_iih_g7Sma7VvAklxm_8kP3ssniIhW-cBSJ85Q/O-sV8MAJVv8.jpg?size=1080x1080&quality=95&sign=e62a240d0744647729d5d73e01ed8156&type=album',
-                    ).image,
-                  ),
-                  launchMode: LaunchMode.externalApplication,
-                  description: S.current.profsouzDesc,
+                launchMode: LaunchMode.externalApplication,
+                description: S.of(context).studSovetDesc,
+              ),
+              CommunityCard(
+                title: S.of(context).profsouz,
+                url: 'https://vk.com/profsouz_au',
+                logo: CircleAvatar(
+                  foregroundImage: Image.network(
+                    'https://sun9-72.userapi.com/impg/_iih_g7Sma7VvAklxm_8kP3ssniIhW-cBSJ85Q/O-sV8MAJVv8.jpg?size=1080x1080&quality=95&sign=e62a240d0744647729d5d73e01ed8156&type=album',
+                  ).image,
                 ),
-                CommunityCard(
-                  title: S.current.brsm,
-                  url: 'https://vk.com/brsmaupprb',
-                  logo: CircleAvatar(
-                    // backgroundColor: AppTheme.colors.colorful01,
-                    foregroundImage: Image.network(
-                      'https://sun9-80.userapi.com/impg/eFwYCzRIzRUEw8alD5FF6TK9HPb3WO6AQYS26w/IPoKJJY237E.jpg?size=640x640&quality=95&sign=5d0e491f2fc847147e20ff1e9daf45e0&type=album',
-                    ).image,
-                  ),
-                  launchMode: LaunchMode.externalApplication,
-                  description: S.current.brsmDesc,
+                launchMode: LaunchMode.externalApplication,
+                description: S.of(context).profsouzDesc,
+              ),
+              CommunityCard(
+                title: S.of(context).brsm,
+                url: 'https://vk.com/brsmaupprb',
+                logo: CircleAvatar(
+                  foregroundImage: Image.network(
+                    'https://sun9-80.userapi.com/impg/eFwYCzRIzRUEw8alD5FF6TK9HPb3WO6AQYS26w/IPoKJJY237E.jpg?size=640x640&quality=95&sign=5d0e491f2fc847147e20ff1e9daf45e0&type=album',
+                  ).image,
                 ),
-              ],
-            ),
+                launchMode: LaunchMode.externalApplication,
+                description: S.of(context).brsmDesc,
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-        ],
-      ),
+        ),
+
+        const SizedBox(
+            height:
+                16), // маленький нижний отступ, чтобы FAB/gestures не перекрывали
+      ],
     );
   }
 }

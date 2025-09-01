@@ -1,97 +1,55 @@
+// task_datasource.dart
+import 'dart:async';
 import 'package:flutter_test_project/models/homework.dart';
-import 'package:flutter_test_project/services/task_keys.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-
-import 'app_keys.dart';
+import 'package:flutter_test_project/services/storage.dart';
 
 class TaskDatasource {
   static final TaskDatasource _instance = TaskDatasource._();
-
   factory TaskDatasource() => _instance;
+  TaskDatasource._();
 
-  TaskDatasource._() {
-    _initDb();
-  }
+  final Storage _storage = Storage();
 
-  static Database? _database;
-
-  Future<Database> get database async {
-    _database ??= await _initDb();
-    return _database!;
-  }
-
-  Future<Database> _initDb() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'tasks.db');
-
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _onCreate,
-    );
-  }
-
-  void _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE ${AppKeys.dbTable} (
-        ${TaskKeys.id} INTEGER PRIMARY KEY AUTOINCREMENT,
-        ${TaskKeys.title} TEXT,
-        ${TaskKeys.note} TEXT,
-        ${TaskKeys.date} TEXT,
-        ${TaskKeys.time} TEXT,
-        ${TaskKeys.isCompleted} INTEGER
-      )
-    ''');
-  }
-
+  /// Добавить задачу; вернёт новый id
   Future<int> addTask(Homework task) async {
-    final db = await database;
-    return db.transaction((txn) async {
-      return await txn.insert(
-        AppKeys.dbTable,
-        task.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    });
+    final tasks = await _storage.loadTasks();
+    final newId = await _storage.nextTaskId();
+
+    // создаём копию с проставленным id через json — не зависит от наличия copyWith
+    final map = Map<String, dynamic>.from(task.toJson());
+    map['id'] = newId;
+    final newTask = Homework.fromJson(map);
+
+    // кладём в начало, чтобы «id DESC» визуально сохранился
+    tasks.insert(0, newTask);
+    await _storage.saveTasks(tasks);
+    return newId;
   }
 
+  /// Получить все задачи (id DESC для совместимости со старым UI)
   Future<List<Homework>> getAllTasks() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      AppKeys.dbTable,
-      orderBy: "id DESC",
-    );
-    return List.generate(
-      maps.length,
-      (index) {
-        return Homework.fromJson(maps[index]);
-      },
-    );
+    final tasks = await _storage.loadTasks();
+    tasks.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
+    return tasks;
   }
 
+  /// Обновить по id; вернёт 1 если обновили, 0 если такой id не найден
   Future<int> updateTask(Homework task) async {
-    final db = await database;
-    return db.transaction((txn) async {
-      return await txn.update(
-        AppKeys.dbTable,
-        task.toJson(),
-        where: 'id = ?',
-        whereArgs: [task.id],
-      );
-    });
+    final tasks = await _storage.loadTasks();
+    final idx = tasks.indexWhere((t) => (t.id ?? -1) == task.id);
+    if (idx == -1) return 0;
+    tasks[idx] = task;
+    await _storage.saveTasks(tasks);
+    return 1;
   }
 
+  /// Удалить по id; вернёт 1 если удалили, 0 если не нашли
   Future<int> deleteTask(Homework task) async {
-    final db = await database;
-    return db.transaction(
-      (txn) async {
-        return await txn.delete(
-          AppKeys.dbTable,
-          where: 'id = ?',
-          whereArgs: [task.id],
-        );
-      },
-    );
+    final tasks = await _storage.loadTasks();
+    final before = tasks.length;
+    tasks.removeWhere((t) => (t.id ?? -1) == task.id);
+    final removed = before - tasks.length;
+    if (removed > 0) await _storage.saveTasks(tasks);
+    return removed;
   }
 }

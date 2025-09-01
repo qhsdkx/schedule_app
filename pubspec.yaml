@@ -1,10 +1,10 @@
 name: flutter_test_project
 description: A new Flutter project.
 
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: '>=3.0.6 <4.0.0'
+  sdk: ">=3.0.6 <4.0.0"
 
 dependencies:
   flutter:
@@ -56,25 +56,25 @@ dependency_overrides:
   intl: ^0.18.1
 
 # flutter_icons:
-#   image_path: "assets/images/smth.png" 
+#   image_path: "assets/images/smth.png"
 #   android: true
 #   ios: true
 #   adaptive_icon_background: "#ffffff"
 
 flutter:
-
   uses-material-design: true
 
   assets:
-      - assets/anims/sleep.riv
-      - assets/anims/empty.riv
-      - assets/anims/error.riv
-      - assets/images/logo.png
-      - assets/images/academy.png
-      - assets/images/max.png
-      - assets/images/computer-engineer.png
-      - assets/images/schedule.png
-      - assets/images/geography.png
+    - assets/anims/sleep.riv
+    - assets/anims/empty.riv
+    - assets/anims/error.riv
+    - assets/images/logo.png
+    - assets/images/academy.png
+    - assets/images/max.png
+    - assets/images/computer-engineer.png
+    - assets/images/schedule.png
+    - assets/images/geography.png
+    - assets/images/smth.png
 
   fonts:
     - family: Montserrat

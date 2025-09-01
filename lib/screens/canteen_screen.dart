@@ -90,41 +90,32 @@ class _CanteenScreenState extends State<CanteenScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-    // return ListView.builder(
-    //   itemCount: widget.canteen.cat.length,
-    //   itemBuilder: (context, index) {
-    //     return CategoryTileContent(
-    //       category: widget.canteen.cat[index],
-    //       selectedItems: selectedItems,
-    //       toggleItemInCart: toggleItemInCart,
-    //     );
-    //   },
-    // );
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.5,
           width: MediaQuery.of(context).size.width * 0.7,
-          child: const RiveAnimation.asset(
-            'assets/anims/error.riv',
-          ),
+          child: const RiveAnimation.asset('assets/anims/error.riv'),
         ),
         Text(
           S.of(context).menuDoesntWork,
-          style: const TextStyle(
-            color: Colors.white,
+          style: theme.textTheme.titleMedium?.copyWith(
             fontSize: 20,
             fontWeight: FontWeight.bold,
+            color: cs.onSurface, // адаптируется к светлой/тёмной теме
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 14),
         Text(
           S.of(context).headerChanged,
-          style: const TextStyle(
-            color: Colors.grey,
+          style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 16,
+            color: cs.onSurface.withOpacity(0.7), // вторичный текст
           ),
           textAlign: TextAlign.center,
         ),

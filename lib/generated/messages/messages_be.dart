@@ -119,7 +119,7 @@ class MessageLookup extends MessageLookupByLibrary {
             'Націсні на Выбраць файл Excel і выберы скачаны табою расклад.'),
         "step4": MessageLookupByLibrary.simpleMessage(
             'Націсні Oк і атрымлівай асалоду ад нашага дадатку!'),
-        "website": MessageLookupByLibrary.simpleMessage('Сайт АК  пПРБ'),
+        "website": MessageLookupByLibrary.simpleMessage('Сайт АКпПРБ'),
         "websiteDesc": MessageLookupByLibrary.simpleMessage(
             'Знайдзі патрэбную інфармацыю'),
         "moodleDesc":

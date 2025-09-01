@@ -74,17 +74,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             _buildCompletedTab(completedTasks, context),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CreateTaskScreen(),
-              ),
-            );
-          },
-          child: const Icon(Icons.add),
-        ),
+        floatingActionButton: _buildFloatingActionButton(context),
+      ),
+    );
+  }
+
+  Widget _buildFloatingActionButton(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding:
+          const EdgeInsets.only(bottom: 24, right: 12), // приподняли на 24px
+      child: FloatingActionButton(
+        heroTag: 'homework-fab',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateTaskScreen(),
+            ),
+          );
+        },
+        backgroundColor: cs.primary,
+        foregroundColor: cs.onPrimary,
+        elevation: 6,
+        tooltip: S.of(context).menu,
+        child: const Icon(Icons.add),
       ),
     );
   }
