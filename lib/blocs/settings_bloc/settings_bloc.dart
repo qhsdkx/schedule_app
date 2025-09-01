@@ -24,7 +24,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     } else {
       settings = Settings.defaultSettings;
     }
-    if (language1 != null) {
+    if (language1.isNotEmpty) {
       language = language1;
     } else {
       language = 'ru';
