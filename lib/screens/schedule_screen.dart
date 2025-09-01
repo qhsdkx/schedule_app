@@ -10,7 +10,6 @@ import 'package:flutter_test_project/screens/settings_screen.dart';
 import 'package:flutter_test_project/widgets/guider.dart';
 import 'package:flutter_test_project/widgets/schedule_widget.dart';
 import 'package:flutter_test_project/widgets/typography.dart';
-import 'package:flutter_test_project/services/app_alerts.dart';
 import 'package:rive/rive.dart';
 import 'package:unicons/unicons.dart';
 import '../blocs/schedule_bloc/schedule_bloc.dart';
@@ -281,12 +280,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildFloatingActionButton(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {
-        _showContextMenu(context);
-      },
-      backgroundColor: Theme.of(context).primaryColor,
-      child: const Icon(Icons.add, size: 36),
+    final cs = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding:
+          const EdgeInsets.only(bottom: 24, right: 12), // приподняли на 24px
+      child: FloatingActionButton(
+        heroTag: 'schedule-fab',
+        onPressed: () => _showContextMenu(context),
+        backgroundColor: cs.primary,
+        foregroundColor: cs.onPrimary,
+        elevation: 6,
+        tooltip: S.of(context).menu,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
