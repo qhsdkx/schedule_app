@@ -16,7 +16,6 @@ dependencies:
   flutter_bloc: ^8.1.2
   table_calendar: ^3.0.9
   equatable: ^2.0.5
-  shared_preferences: ^2.2.1
   sqflite: ^2.3.0
   rive: ^0.12.3
   flutter_staggered_animations: ^1.1.1
@@ -34,6 +33,10 @@ dependencies:
   url_launcher: ^6.2.2
   unicons: ^2.1.1
   shimmer: ^3.0.0
+  js: ^0.6.7
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  localstorage: ^6.0.0
 
 dev_dependencies:
   flutter_test:

@@ -22,7 +22,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   @override
   void initState() {
     final bloc = context.read<ScheduleBloc>();
-    var temp = DateTime.now().toString().replaceRange(10, 26, '');
+    var temp = DateTime.now().toString().substring(0, 10);
     _selectedDate = DateTime.parse(temp);
     bloc.add(ChangeDateOfClasses(_selectedDate));
     bloc.add(LoadSchedule(_selectedDate));
@@ -49,8 +49,13 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         weekendDays: const [DateTime.sunday],
         startingDayOfWeek: StartingDayOfWeek.monday,
         headerStyle: HeaderStyle(
-          titleTextStyle: Style.bodyL.copyWith(fontSize: 16),
-          formatButtonTextStyle: Style.bodyRegular,
+          titleTextStyle: Style.bodyL.copyWith(fontSize: 14),
+          formatButtonTextStyle: Style.bodyRegular.copyWith(fontSize: 12),
+          titleCentered: true,
+          formatButtonVisible: false,
+          leftChevronVisible: true,
+          rightChevronVisible: true,
+          headerPadding: const EdgeInsets.symmetric(horizontal: 8),
         ),
         calendarStyle: CalendarStyle(
           defaultTextStyle: Style.bodyRegular,
@@ -85,9 +90,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         onDaySelected: (prevDate, selDate) {
           setState(() {
             final bloc = context.read<ScheduleBloc>();
-            var temp = selDate
-                .toString()
-                .replaceRange(10, selDate.toString().length, '');
+            var temp = selDate.toString().substring(0, 10);
             _selectedDate = DateTime.parse(temp);
             bloc.add(ChangeDateOfClasses(_selectedDate));
             bloc.add(LoadSchedule(_selectedDate));

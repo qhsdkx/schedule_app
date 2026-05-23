@@ -33,7 +33,12 @@ class ExcelParsing {
   );
 
   Future<List<Day>?> parse(PlatformFile file) async {
-    final bytes = await File(file.path ?? '').readAsBytes();
+    late final List<int> bytes;
+    if (file.bytes != null) {
+      bytes = file.bytes!;
+    } else {
+      bytes = await File(file.path ?? '').readAsBytes();
+    }
     excel = Excel.decodeBytes(bytes);
     if (!_isThereSeparationByStreams(excel)) {
       var sheet = excel[excel.getDefaultSheet() as String];

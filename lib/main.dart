@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test_project/blocs/schedule_bloc/schedule_bloc.dart';
 import 'package:flutter_test_project/screens/onboarding_screen.dart';
 import 'package:flutter_test_project/screens/schedule_screen.dart';
 import 'package:flutter_test_project/themes/dark_theme/dark_theme.dart';
@@ -10,8 +9,11 @@ import 'package:flutter_test_project/themes/light_theme/light_theme.dart';
 import 'blocs/settings_bloc/settings_bloc.dart';
 import 'generated/l10n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:localstorage/localstorage.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initLocalStorage();
   runApp(const ProviderScope(child: ScheduleApp()));
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -38,9 +40,6 @@ class ScheduleApp extends StatelessWidget {
         BlocProvider<SettingsBloc>(
           create: (context) => SettingsBloc(),
         ),
-        BlocProvider<ScheduleBloc>(
-          create: (context) => ScheduleBloc(),
-        )
       ],
       child: BlocBuilder<SettingsBloc, SettingsState>(
         buildWhen: (prevState, newState) {

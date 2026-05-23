@@ -10,7 +10,7 @@ part 'schedule_event.dart';
 part 'schedule_state.dart';
 
 class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
-  final String date = DateTime.now().toString().replaceRange(10, 26, '');
+  final String date = DateTime.now().toString().substring(0, 10);
   late DateTime currentDay = DateTime.parse(date);
   PlatformFile? globalFile;
 

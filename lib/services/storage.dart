@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:ui' as ui;
 import '../models/settings.dart';
 import 'package:flutter_test_project/services/parser/parser.dart';
 import 'package:flutter_test_project/models/homework.dart';
@@ -26,13 +26,11 @@ class Storage {
   }
 
   Future<void> saveSettings(Settings settings) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('settsNew68', jsonEncode(settings.toMap()));
+    localStorage.setItem(SETTINGS_KEY, jsonEncode(settings.toMap()));
   }
 
   Future<Settings?> readSettings() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final settings = prefs.getString('settsNew68');
+    final settings = localStorage.getItem(SETTINGS_KEY);
     if (settings != null && settings.isNotEmpty) {
       return Settings.fromMap(jsonDecode(settings));
     }
@@ -40,77 +38,72 @@ class Storage {
   }
 
   Future<void> saveSchedule(String date, String jsonFromBloc) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(date, jsonFromBloc);
+    localStorage.setItem('schedule:$date', jsonFromBloc);
   }
 
   Future<String> readSchedule(String date) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final schedule = prefs.getString(date).toString();
-    return schedule;
+    final key = 'schedule:$date';
+    final s = localStorage.getItem(key);
+    return s ?? '';
   }
 
   Future<void> clearStorage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final settings = prefs.getString('settsNew68');
-    final language = prefs.getString('language');
-    prefs.clear();
-    prefs.setString('settsNew68', settings ?? '');
-    prefs.setString('language', language ?? '');
+    final settings = localStorage.getItem(SETTINGS_KEY);
+    final language = localStorage.getItem(LANGUAGE_KEY);
+    final tasks = localStorage.getItem(TASKS_KEY);
+    final tasks_seq = localStorage.getItem(TASKS_SEQ_KEY);
+    final works = localStorage.getItem(SCIENTIFIC_WORKS_KEY);
+    final works_seq = localStorage.getItem(SCIENTIFIC_WORKS_SEQ_KEY);
+    final grades = localStorage.getItem(GRADES_KEY);
+    final grades_seq = localStorage.getItem(GRADES_SEQ_KEY);
+    localStorage.clear();
+    localStorage.setItem(SETTINGS_KEY, settings ?? '');
+    localStorage.setItem(LANGUAGE_KEY, language ?? '');
+    localStorage.setItem(TASKS_KEY, tasks ?? '');
+    localStorage.setItem(TASKS_SEQ_KEY, tasks_seq ?? '');
+    localStorage.setItem(SCIENTIFIC_WORKS_KEY, works ?? '');
+    localStorage.setItem(SCIENTIFIC_WORKS_SEQ_KEY, works_seq ?? '');
+    localStorage.setItem(GRADES_KEY, grades ?? '');
+    localStorage.setItem(GRADES_SEQ_KEY, grades_seq ?? '');
   }
 
   Future<void> clearFullStorage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.clear();
+    localStorage.clear();
   }
 
   Future<void> saveTime(List<String> time) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('time4', time);
+    localStorage.setItem('time4', jsonEncode(time));
   }
 
   Future<List<String>> readTime() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final time = prefs.getStringList('time4') ?? [];
-    return time;
+    final ti = localStorage.getItem('time4');
+    if (ti == null || ti.isEmpty) return [];
+    return (jsonDecode(ti) as List).map((e) => e.toString()).toList();
   }
 
   Future<void> saveClassesData(List<DataClasses> classes) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final jsonList = classes.map((item) => item.toJson()).toList();
-      await prefs.setString(DATA_KEY, jsonEncode(jsonList));
-    } catch (e) {
-      throw Exception('Не удалось сохранить данные в кэш');
-    }
+    final jsonList = classes.map((item) => item.toJson()).toList();
+    final jsonStr = jsonEncode(jsonList);
+    localStorage.setItem(DATA_KEY, jsonStr);
   }
 
   Future<List<DataClasses>> loadClassesData() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(DATA_KEY);
-
-      if (jsonString == null || jsonString.isEmpty) {
-        return [];
-      }
-
-      final decodedData = jsonDecode(jsonString) as List<dynamic>;
-      return decodedData.map((item) {
-        return DataClasses(
-          item['shortName'] as String,
-          item['fullName'] as String,
-          item['attestationForm'] as String,
-          item['teachers'] as String,
-        );
-      }).toList();
-    } catch (e) {
-      throw Exception('Не удалось загрузить данные из кэша');
-    }
+    final String? jsonString;
+    jsonString = localStorage.getItem(DATA_KEY);
+    if (jsonString == null || jsonString.isEmpty) return [];
+    final decodedData = jsonDecode(jsonString) as List<dynamic>;
+    return decodedData
+        .map((item) => DataClasses(
+              item['shortName'] as String,
+              item['fullName'] as String,
+              item['attestationForm'] as String,
+              item['teachers'] as String,
+            ))
+        .toList();
   }
 
   Future<void> saveLanguage(String language) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('language', language);
+    localStorage.setItem(LANGUAGE_KEY, language);
   }
 
   Future<String> loadLanguage() async {

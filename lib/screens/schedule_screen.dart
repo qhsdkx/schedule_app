@@ -316,23 +316,24 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     int selectedGroupNumber = 1;
     int selectedStreamGroupCount = 2;
 
+    final scheduleBloc = context.read<ScheduleBloc>();
+    final settingsBloc = context.read<SettingsBloc>();
+
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        final bloc = context.read<ScheduleBloc>();
-        final settingsBloc = context.read<SettingsBloc>();
+      builder: (BuildContext dialogContext) {
         return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
+          builder: (BuildContext dialogContext, StateSetter setState) {
             return AlertDialog(
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(S.of(context).menu,
+                  Text(S.of(dialogContext).menu,
                       style: Style.bodyL.copyWith(fontSize: 22)),
                   IconButton(
                     icon: const Icon(Icons.help),
                     onPressed: () {
-                      showUsageGuideBottomSheet(context);
+                      showUsageGuideBottomSheet(dialogContext);
                     },
                   ),
                 ],
@@ -345,10 +346,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       settingsBloc.add(const ClearCache());
-                      bloc.add(const PickFile());
+                      scheduleBloc.add(const PickFile());
                     },
                     child: Text(
-                      S.of(context).chooseExcel,
+                      S.of(dialogContext).chooseExcel,
                       style: Style.captionL.copyWith(fontSize: 14),
                     ),
                   ),
@@ -357,7 +358,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               actions: [
                 TextButton(
                   onPressed: () async {
-                    bloc.add(SaveSchedule(
+                    scheduleBloc.add(SaveSchedule(
                         group: settingsBloc.settings.group,
                         numOfGroups: settingsBloc.settings.numOfGroups));
                     settingsBloc.add(ChangeSettings(
@@ -366,16 +367,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         settingsBloc.settings.numOfGroups,
                         settingsBloc.settings.isFirstLaunch,
                         true));
-                    bloc.add(LoadSchedule(DateTime.now()));
-                    Navigator.pop(context);
+                    scheduleBloc.add(LoadSchedule(DateTime.now()));
+                    Navigator.pop(dialogContext);
                   },
-                  child: Text(S.of(context).ok, style: Style.buttonS),
+                  child: Text(S.of(dialogContext).ok, style: Style.buttonS),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(dialogContext);
                   },
-                  child: Text(S.of(context).cancel, style: Style.buttonS),
+                  child: Text(S.of(dialogContext).cancel, style: Style.buttonS),
                 ),
               ],
               contentPadding:
