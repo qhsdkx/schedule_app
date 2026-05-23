@@ -55,7 +55,9 @@ class ScheduleApp extends StatelessWidget {
             ));
           } else if (state is SettingsLoaded) {
             return MaterialApp(
+              key: ValueKey(bloc.language),
               debugShowCheckedModeBanner: false,
+              locale: Locale(bloc.language),
               onGenerateTitle: (context) => S.of(context).schedule,
               theme: lightTheme,
               darkTheme: darkTheme,

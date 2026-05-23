@@ -29,7 +29,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     } else {
       language = 'ru';
     }
-    emit(SettingsLoaded(settings));
+    emit(SettingsLoaded(settings, language: language));
   }
 
   SettingsBloc() : super(SettingsInitial()) {
@@ -52,7 +52,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       settings.isFirstLaunch = event.isFirstLaunch;
       settings.isScheduleLoaded = event.isScheduleLoaded;
       Storage().saveSettings(settings);
-      emit(SettingsLoaded(settings));
+      emit(SettingsLoaded(settings, language: language));
     } catch (_) {
       emit(const SettingsError('Произошла ошибка'));
     }
@@ -65,8 +65,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     try {
       language = event.language;
       Storage().saveLanguage(language);
-      emit(const LanguageLoaded('Well done'));
-      emit(SettingsLoaded(settings));
+      emit(SettingsLoaded(settings, language: language));
     } catch (_) {
       emit(const LanguageLoaded('Something went wrong'));
     }
@@ -79,7 +78,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(SettingsInitial());
     await Storage().clearStorage();
     emit(const CachedDataDeleted('Кэшированые данные были удалены'));
-    emit(SettingsLoaded(settings));
+    emit(SettingsLoaded(settings, language: language));
   }
 
   FutureOr<void> _onFullClearCache(
@@ -89,6 +88,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(SettingsInitial());
     await Storage().clearFullStorage();
     emit(const FullCachedDataDeleted('Кэшированые данные были удалены'));
-    emit(SettingsLoaded(settings));
+    emit(SettingsLoaded(settings, language: language));
   }
 }

@@ -7,6 +7,8 @@ import 'package:flutter_test_project/screens/canteen_screen.dart';
 import 'package:flutter_test_project/screens/error_screen.dart';
 import 'package:flutter_test_project/screens/services_screen.dart';
 import 'package:flutter_test_project/screens/settings_screen.dart';
+import 'package:flutter_test_project/screens/scientific_works_screen.dart';
+import 'package:flutter_test_project/screens/grades_screen.dart';
 import 'package:flutter_test_project/widgets/guider.dart';
 import 'package:flutter_test_project/widgets/schedule_widget.dart';
 import 'package:flutter_test_project/widgets/typography.dart';
@@ -149,6 +151,26 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             ),
             onTap: () {
               pushToNotificationScreen(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.menu_book),
+            title: Text(
+              S.of(context).scientificWorks,
+              style: Style.bodyRegular.copyWith(fontSize: 16),
+            ),
+            onTap: () {
+              pushToScientificWorksScreen(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.grade),
+            title: Text(
+              S.of(context).grades,
+              style: Style.bodyRegular.copyWith(fontSize: 16),
+            ),
+            onTap: () {
+              pushToGradesScreen(context);
             },
           ),
           ListTile(
@@ -531,41 +553,30 @@ void pushToDataClassesScreen(BuildContext context) {
 }
 
 Future<void> pushToCanteenScreenWithLoading(BuildContext context) async {
-  // List<String> canteenLoadingPhrases = [
-  //   "Ищем печеньки...",
-  //   "Тетя Зина накрывает на стол...",
-  //   "Греем сосиски в тесте...",
-  //   "Нарезаем салаты...",
-  //   "Разгоняем заочников...",
-  //   "Занимаем очередь..."
-  // ];
-
-  // showDialog(
-  //   context: context,
-  //   barrierDismissible: false,
-  //   builder: (BuildContext context) {
-  //     return AlertDialog(
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Center(
-  //             child: LoadingAnimationWidget.fourRotatingDots(
-  //               size: 50,
-  //               color: Colors.green,
-  //             ),
-  //           ),
-  //           const SizedBox(height: 8),
-  //           Text(canteenLoadingPhrases[
-  //               Random().nextInt(canteenLoadingPhrases.length)]),
-  //         ],
-  //       ),
-  //     );
-  //   },
-
   Navigator.pushReplacement(
     context,
     MaterialPageRoute(
       builder: (_) => const CanteenScreen(),
+    ),
+  );
+}
+
+void pushToScientificWorksScreen(BuildContext context) {
+  Navigator.of(context).popUntil((route) => route.isFirst);
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const ScientificWorksScreen(),
+    ),
+  );
+}
+
+void pushToGradesScreen(BuildContext context) {
+  Navigator.of(context).popUntil((route) => route.isFirst);
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const GradesScreen(),
     ),
   );
 }

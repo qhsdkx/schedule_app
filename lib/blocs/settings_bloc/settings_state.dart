@@ -1,6 +1,5 @@
 part of 'settings_bloc.dart';
 
-// RE-DO
 abstract class SettingsState extends Equatable {
   const SettingsState();
 
@@ -14,8 +13,12 @@ class SettingsLoading extends SettingsState {}
 
 class SettingsLoaded extends SettingsState {
   final Settings settings;
+  final String language;
 
-  const SettingsLoaded(this.settings);
+  const SettingsLoaded(this.settings, {this.language = ''});
+
+  @override
+  List<Object> get props => [language];
 }
 
 class LanguageLoaded extends SettingsState {
